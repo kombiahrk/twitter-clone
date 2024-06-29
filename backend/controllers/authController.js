@@ -35,8 +35,6 @@ export const signup = async (req, res) => {
             password: hashedPassword
         })
 
-        console.log(newUser._id)
-
         if (newUser) {
             generateTokenAndSetCookie(newUser._id, res)
             await newUser.save();
@@ -49,9 +47,9 @@ export const signup = async (req, res) => {
                 followers: newUser.followers,
                 following: newUser.following,
                 profileImg: newUser.profileImg,
-                coverImg: newUser.coverImg,
-                message: "User created successfully"
-            })
+                coverImg: newUser.coverImg
+            })            
+            console.log("User created successfully")
         } else {
             res.status(400).json({ error: "Invalid user data" })
         }
