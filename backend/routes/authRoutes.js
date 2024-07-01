@@ -1,10 +1,10 @@
 import express from "express";
-import { signup, login, logout, authCheck } from "../controllers/authController.js";
-import { protectedRoute } from "../middleware/protectedRoute.js";
+import { signup, login, logout, getUser } from "../controllers/authController.js";
+import { isAuthorized } from "../middleware/authCheck.js";
 
 const router = express.Router();
 
-router.get('/check', protectedRoute, authCheck);
+router.get('/getUser', isAuthorized, getUser);
 
 router.post('/signup', signup);
 
