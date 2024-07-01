@@ -97,7 +97,18 @@ export const logout = async (req, res) => {
         res.status(200).json({ error: "User logged out successfully" })
         console.log("User logged out successfully");
     } catch (error) {
-        console.log("Error in logouut controller", error.message)
+        console.log("Error in logout controller", error.message)
+        res.status(500).json({ error: "Internal Server Error" })
+    }
+}
+
+export const authCheck = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).select("-password");
+        res.status(200).json(user);
+        console.log("Valid user only logged in");
+    } catch (error) {
+        console.log("Error in authCheck controller", error.message)
         res.status(500).json({ error: "Internal Server Error" })
     }
 }
