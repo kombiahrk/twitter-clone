@@ -4,7 +4,7 @@ import { isAuthorized } from "../middleware/authCheck.js";
 
 const router = express.Router();
 
-router.get('/getUser', isAuthorized, getUser);
+router.get('/getuser', isAuthorized, getUser);
 
 router.post('/signup', signup);
 
