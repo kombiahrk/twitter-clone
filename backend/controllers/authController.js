@@ -102,13 +102,13 @@ export const logout = async (req, res) => {
     }
 }
 
-export const authCheck = async (req, res) => {
+export const getUser = async (req, res) => {
     try {
         const user = await User.findById(req.user._id).select("-password");
         res.status(200).json(user);
         console.log("Valid user only logged in");
     } catch (error) {
-        console.log("Error in authCheck controller", error.message)
+        console.log("Error in getUser controller", error.message)
         res.status(500).json({ error: "Internal Server Error" })
     }
 }
