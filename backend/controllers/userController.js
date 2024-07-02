@@ -50,18 +50,49 @@ export const followOrUnFollow = async (req, res) => {
 
             //send notification to the user
             const newNotification = new Notification({
-                type : "follow",
-                from : req.user._id,
+                type: "follow",
+                from: req.user._id,
                 to: id,
             });
 
             await newNotification.save();
 
             console.log("User followed successfully");
-            res.status(200).json({ message: "User followed successfully" }); 
+            res.status(200).json({ message: "User followed successfully" });
         }
     } catch (error) {
         console.log("Error in followOrUnfollow controller:", error.message)
+        res.status(500).json({ error: "Internal Server Error" })
+    }
+}
+
+export const getSuggestedUser = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const userFollowedByMe = await User.findById(userId).select("following");
+        const users = await User.aggregate([
+            {
+                $match: {
+                    _id: { $ne: userId } //Filters out documents where the _id matches the specified userId. $ne stands for "not equal".
+                }
+            },
+            {
+                $sample: {
+                    size: 10 // Randomly selects a specified number of documents
+                }
+            },
+            {
+                $project: {
+                    password: 0  // Exclude the password field
+                }
+            }
+        ])
+
+        const filteredUsers = users.filter(user => !userFollowedByMe.following.includes(user._id))
+        const suggestedUsers = filteredUsers.slice(0, 4)
+        res.status(200).json(suggestedUsers)
+    } catch (error) {
+        console.log("Error in getSuggestedUser controller:", error.message)
         res.status(500).json({ error: "Internal Server Error" })
     }
 }
