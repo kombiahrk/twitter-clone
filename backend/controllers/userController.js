@@ -1,3 +1,4 @@
+import Notification from "../models/notificationSchema.js";
 import User from "../models/userSchema.js";
 
 export const getUserProfile = async (req, res) => {
@@ -46,8 +47,18 @@ export const followOrUnFollow = async (req, res) => {
             //follow the user
             await User.findByIdAndUpdate(req.user._id, { $push: { following: id } })
             await User.findByIdAndUpdate(id, { $push: { followers: req.user._id } })
+
+            //send notification to the user
+            const newNotification = new Notification({
+                type : "follow",
+                from : req.user._id,
+                to: id,
+            });
+
+            await newNotification.save();
+
             console.log("User followed successfully");
-            res.status(200).json({ message: "User followed successfully" });
+            res.status(200).json({ message: "User followed successfully" }); 
         }
     } catch (error) {
         console.log("Error in followOrUnfollow controller:", error.message)
