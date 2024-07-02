@@ -1,12 +1,12 @@
 import express from "express";
-import donenv from "dotenv";
+import dotenv from "dotenv";
 import authRoutes from "./routes/authRouter.js";
 import userRoutes from "./routes/userRouter.js";
 import connectMongoDB from "./db/connectMongoDB.js";
 import cookieParser from "cookie-parser";
 import { v2 as cloudinary } from "cloudinary";
 
-donenv.config();
+dotenv.config();
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
