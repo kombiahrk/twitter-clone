@@ -32,7 +32,7 @@ export const followOrUnFollow = async (req, res) => {
 
         if (!userToFollowOrUnFollow || !currentUser) {
             console.log("User not found");
-            return res.status(400).json({ error: "User not found" });
+            return res.status(404).json({ error: "User not found" });
         }
 
         const isFollowing = currentUser.following.includes(id);
