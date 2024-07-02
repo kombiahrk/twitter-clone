@@ -4,8 +4,15 @@ import authRoutes from "./routes/authRouter.js";
 import userRoutes from "./routes/userRouter.js";
 import connectMongoDB from "./db/connectMongoDB.js";
 import cookieParser from "cookie-parser";
+import { v2 as cloudinary } from "cloudinary";
 
 donenv.config();
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: CLOUDINARY_API_KEY,
+    api_secret: CLOUDINARY_API_SECRET,
+});
 
 const app = express();
 const PORT = process.env.PORT || 8080;
