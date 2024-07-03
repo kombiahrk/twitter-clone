@@ -1,4 +1,4 @@
-import express from "express"
+import express from "express";
 import { isAuthorized } from "../middleware/authCheck.js";
 import { getUserProfile, followOrUnFollow, getSuggestedUser, updateUser } from "../controllers/userController.js";
 
