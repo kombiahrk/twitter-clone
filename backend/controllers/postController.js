@@ -171,6 +171,11 @@ export const getLikedPosts = async (req, res) => {
             .populate({ path: "user", select: ["-password", "-email"] })
             .populate({ path: "comments.user", select: ["-password"] });
 
+        if (likedPosts.length === 0) {
+            console.log("No Post is there to display")
+            return res.status(200).json([])
+        }
+
         console.log(likedPosts.length + " posts reterived successfully")
         res.status(200).json(likedPosts);
     } catch (error) {
