@@ -147,7 +147,7 @@ export const getAllPosts = async (req, res) => {
             return res.status(200).json([])
         }
 
-        console.log(posts.lenght + " post reterived successfully")
+        console.log(posts.length + " posts reterived successfully")
         res.status(200).json(posts)
 
     } catch (error) {
