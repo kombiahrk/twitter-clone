@@ -1,11 +1,13 @@
 import express from "express";
 
 import { isAuthorized } from "../middleware/authCheck.js";
-import { commentOnPost, createPost, deletePost, getAllPosts, likeUnlikePost } from "../controllers/postController.js";
+import { commentOnPost, createPost, deletePost, getAllPosts, getLikedPosts, likeUnlikePost } from "../controllers/postController.js";
 
 const router = express.Router();
 
 router.get("/all", isAuthorized, getAllPosts);
+
+router.get("/liked/:id", isAuthorized, getLikedPosts);
 
 router.post("/create", isAuthorized, createPost);
 
