@@ -7,10 +7,10 @@ const router = express.Router();
 
 router.post("/create", isAuthorized, createPost);
 
-router.delete("/delete/:id", isAuthorized, deletePost);
-
 router.post("/comment/:id", isAuthorized, commentOnPost);
 
 router.post("/like/:id", isAuthorized, likeUnlikePost);
+
+router.delete("/delete/:id", isAuthorized, deletePost);
 
 export default router;
