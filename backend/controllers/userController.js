@@ -154,7 +154,7 @@ export const updateUser = async (req, res) => {
         user.bio = bio || user.bio;
         user.link = link || user.link;
         user.profileImg = profileImg || user.profileImg;
-        user.coverImg = coverImg || user.coverImg; 
+        user.coverImg = coverImg || user.coverImg;
 
         user = await user.save();
 
