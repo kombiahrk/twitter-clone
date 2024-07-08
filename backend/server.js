@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import authRoutes from "./routes/authRouter.js";
 import userRoutes from "./routes/userRouter.js";
 import postRoutes from "./routes/postRouter.js";
@@ -19,6 +20,7 @@ cloudinary.config({
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+app.use(cors()); // Enable CORS for all origins
 app.use(express.json()); // to parse req.body
 app.use(express.urlencoded({ extended: true })); //to parse form data
 app.use(cookieParser());
