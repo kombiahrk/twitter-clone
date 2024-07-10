@@ -21,7 +21,7 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 app.use(cors()); // Enable CORS for all origins
-app.use(express.json()); // to parse req.body
+app.use(express.json({ limit: "5mb" })); // to parse req.body
 app.use(express.urlencoded({ extended: true })); //to parse form data
 app.use(cookieParser());
 
