@@ -88,8 +88,9 @@ export const commentOnPost = async (req, res) => {
         const comment = { user: userId, text };
         post.comments.push(comment);
         await post.save();
+        const updatedPost = await Post.findById(postId).populate({ path: "comments.user", select: ["profileImg", "fullName", "username"] });
         console.log("Comment Posted successfully");
-        res.status(200).json(post);
+        res.status(200).json(updatedPost);
     } catch (error) {
         console.log("Error in commentOnPost controller:", error.message)
         res.status(500).json({ error: "Internal Server Error" })
@@ -115,7 +116,7 @@ export const likeUnlikePost = async (req, res) => {
             await User.updateOne({ _id: userId }, { $pull: { likedPosts: postId } })
 
             const updatedLikes = post.likes.filter((id) => id.toString() !== userId.toString());
-            
+
             console.log("Post unliked successfully");
             res.status(200).json(updatedLikes)
         } else {
