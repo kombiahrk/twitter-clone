@@ -62,8 +62,48 @@ const Post = ({ post }) => {
 			// queryClient.invalidateQueries({ queryKey: ["posts"] })
 			queryClient.setQueryData(["posts"], (oldData) => {
 				return oldData.map(p => {
-					if(p._id === post._id){
-						return {...p, likes:updatedLikes}
+					if (p._id === post._id) {
+						return { ...p, likes: updatedLikes }
+					}
+					return p
+				})
+			})
+		},
+		onError: () => {
+			toast.error(error.message)
+		}
+	})
+
+	const { mutate: commentOnPost, isPending: isCommenting } = useMutation({
+		mutationFn: async () => {
+			try {
+				const res = await fetch(`/api/post/comment/${post._id}`, {
+					method: "POST",
+					headers: {
+						"content-type": "application/json",
+					},
+					body: JSON.stringify({ text: comment }),
+				})
+
+				const data = await res.json();
+
+				if (!res.ok) {
+					throw new Error(data.error || "something went wrong");
+				}
+
+				return data;
+			} catch (error) {
+				throw new Error(error);
+			}
+		},
+		onSuccess: (post) => {
+			toast.success("Comment Posted Successfully");
+			setComment("");
+			queryClient.setQueryData(["posts"], (oldData) => {
+				return oldData.map(p => {
+					if (p._id === post._id) {
+						console.log(post.comments)
+						return { ...p, comments: post.comments }
 					}
 					return p
 				})
@@ -81,14 +121,14 @@ const Post = ({ post }) => {
 
 	const formattedDate = "1h";
 
-	const isCommenting = false;
-
 	const handleDeletePost = () => {
 		deletePost();
 	};
 
 	const handlePostComment = (e) => {
 		e.preventDefault();
+		if (isCommenting) return;
+		commentOnPost();
 	};
 
 	const handleLikePost = () => {
@@ -187,11 +227,14 @@ const Post = ({ post }) => {
 											value={comment}
 											onChange={(e) => setComment(e.target.value)}
 										/>
-										<button className='btn btn-primary rounded-full btn-sm text-white px-4'>
+										<button
+											className='btn btn-primary rounded-full btn-sm text-white px-4'
+											disabled={!comment.trim()}
+										>
 											{isCommenting ? (
 												<LoadingSpinner size='md' />
 											) : (
-												"Post"
+												"Submit"
 											)}
 										</button>
 									</form>
@@ -206,7 +249,7 @@ const Post = ({ post }) => {
 							</div>
 							<div className='flex gap-1 items-center group cursor-pointer' onClick={handleLikePost}>
 								{isLiking && <LoadingSpinner size='sm' />}
-								{!isLiked && !isLiking &&(
+								{!isLiked && !isLiking && (
 									<FaRegHeart className='w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500' />
 								)}
 								{isLiked && !isLiking && <FaRegHeart className='w-4 h-4 cursor-pointer text-pink-500 ' />}
