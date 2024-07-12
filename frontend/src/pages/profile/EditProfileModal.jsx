@@ -1,19 +1,64 @@
-import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
-const EditProfileModal = () => {
+const EditProfileModal = ({ authUser }) => {
+
+	const queryClient = useQueryClient();
+
 	const [formData, setFormData] = useState({
 		fullName: "",
-		username: "",
-		email: "",
 		bio: "",
 		link: "",
 		newPassword: "",
 		currentPassword: "",
 	});
 
+	const { mutate: updateProfile, isPending: isUpdatingProfile } = useMutation({
+		mutationFn: async () => {
+			try {
+				const res = await fetch('/api/user/update/', {
+					method: "POST",
+					headers: {
+						"content-type": "application/json"
+					},
+					body: JSON.stringify(formData),
+				})
+				const data = await res.json();
+				if (!res.ok) throw new Error(data.error || "something went wrong");
+				return data;
+			} catch (error) {
+				throw new Error(error);
+			}
+		},
+		onSuccess: () => {
+			toast.success("Profile updated successfully");
+			Promise.all([
+				queryClient.invalidateQueries({ queryKey: ["authUser"] }),
+				queryClient.invalidateQueries({ queryKey: ["userProfile"] }),
+				queryClient.invalidateQueries({ queryKey: ["posts"] })
+			])
+		},
+		onError: (error) => {
+			toast.error(error.message);
+		}
+	})
+
 	const handleInputChange = (e) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
+
+	useEffect(() => {
+		if (authUser) {
+			setFormData({
+				fullName: authUser.fullName,
+				bio: authUser.bio,
+				link: authUser.link,
+				currentPassword: "",
+				newPassword: "",
+			});
+		}
+	}, [authUser])
 
 	return (
 		<>
@@ -30,7 +75,7 @@ const EditProfileModal = () => {
 						className='flex flex-col gap-4'
 						onSubmit={(e) => {
 							e.preventDefault();
-							alert("Profile updated successfully");
+							updateProfile();
 						}}
 					>
 						<div className='flex flex-wrap gap-2'>
@@ -42,24 +87,8 @@ const EditProfileModal = () => {
 								name='fullName'
 								onChange={handleInputChange}
 							/>
-							<input
-								type='text'
-								placeholder='Username'
-								className='flex-1 input border border-gray-700 rounded p-2 input-md'
-								value={formData.username}
-								name='username'
-								onChange={handleInputChange}
-							/>
 						</div>
 						<div className='flex flex-wrap gap-2'>
-							<input
-								type='email'
-								placeholder='Email'
-								className='flex-1 input border border-gray-700 rounded p-2 input-md'
-								value={formData.email}
-								name='email'
-								onChange={handleInputChange}
-							/>
 							<textarea
 								placeholder='Bio'
 								className='flex-1 input border border-gray-700 rounded p-2 input-md'
@@ -68,6 +97,14 @@ const EditProfileModal = () => {
 								onChange={handleInputChange}
 							/>
 						</div>
+						<input
+							type='text'
+							placeholder='Link'
+							className='flex-1 input border border-gray-700 rounded p-2 input-md'
+							value={formData.link}
+							name='link'
+							onChange={handleInputChange}
+						/>
 						<div className='flex flex-wrap gap-2'>
 							<input
 								type='password'
@@ -86,15 +123,9 @@ const EditProfileModal = () => {
 								onChange={handleInputChange}
 							/>
 						</div>
-						<input
-							type='text'
-							placeholder='Link'
-							className='flex-1 input border border-gray-700 rounded p-2 input-md'
-							value={formData.link}
-							name='link'
-							onChange={handleInputChange}
-						/>
-						<button className='btn btn-primary rounded-full btn-sm text-white'>Update</button>
+						<button className='btn btn-primary rounded-full btn-sm text-white'>
+							{isUpdatingProfile ? "Updating..." : "Update"}
+						</button>
 					</form>
 				</div>
 				<form method='dialog' className='modal-backdrop'>
