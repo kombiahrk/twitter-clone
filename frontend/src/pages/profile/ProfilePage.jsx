@@ -13,6 +13,8 @@ import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import { useQuery } from "@tanstack/react-query";
 import { formatMemberSinceDate } from "../../utils/date";
+import useFollow from "../../hooks/useFollow";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const ProfilePage = () => {
 	const [coverImg, setCoverImg] = useState(null);
@@ -22,7 +24,7 @@ const ProfilePage = () => {
 	const coverImgRef = useRef(null);
 	const profileImgRef = useRef(null);
 
-	const { username } = useParams();	
+	const { username } = useParams();
 
 	const { data: authUser } = useQuery({ queryKey: ['authUser'] });
 
@@ -39,11 +41,15 @@ const ProfilePage = () => {
 				throw new Error(error);
 			}
 		}
-	});	
+	});
 
-	const isMyProfile = authUser._id === user?._id;	
+	const isMyProfile = authUser._id === user?._id;
 
 	const memberSinceDate = formatMemberSinceDate(user?.createdAt);
+
+	const { followOrUnFollow, isPending } = useFollow();
+
+	const isFollowing = authUser?.following.includes(user?._id);
 
 	const handleImgChange = (e, state) => {
 		const file = e.target.files[0];
@@ -129,9 +135,11 @@ const ProfilePage = () => {
 								{!isMyProfile && (
 									<button
 										className='btn btn-outline rounded-full btn-sm'
-										onClick={() => alert("Followed successfully")}
+										onClick={() => followOrUnFollow(user?._id)}
 									>
-										Follow
+										{isPending && (< LoadingSpinner size='sm' />)}
+										{!isPending && isFollowing && "Unfollow"}
+										{!isPending && !isFollowing && "Follow"}
 									</button>
 								)}
 								{(coverImg || profileImg) && (
