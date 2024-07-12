@@ -22,9 +22,9 @@ const ProfilePage = () => {
 	const coverImgRef = useRef(null);
 	const profileImgRef = useRef(null);
 
-	const { username } = useParams();
+	const { username } = useParams();	
 
-	const isMyProfile = false;	
+	const { data: authUser } = useQuery({ queryKey: ['authUser'] });
 
 	const { data: user, isLoading, refetch, isRefetching } = useQuery({
 		queryKey: ['userprofile'],
@@ -40,6 +40,8 @@ const ProfilePage = () => {
 			}
 		}
 	});	
+
+	const isMyProfile = authUser._id === user?._id;	
 
 	const memberSinceDate = formatMemberSinceDate(user?.createdAt);
 
